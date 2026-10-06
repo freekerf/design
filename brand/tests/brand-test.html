@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>FreeKerf — teste de logo e ícone</title>
+<link rel="icon" href="../icon/favicon.svg">
+<style>
+body{margin:0;font:14px/1.4 Inter,system-ui,sans-serif;background:#888}
+.row{display:flex;gap:0}
+.pane{flex:1;padding:24px;display:flex;flex-direction:column;gap:20px}
+.dark{background:#0E1115;color:#E9EDF2}.light{background:#F6F7F9;color:#151A20}
+h2{margin:0;font-size:13px;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
+.sizes{display:flex;align-items:flex-end;gap:18px}
+.sizes figure{margin:0;text-align:center;font-size:11px;opacity:.85}
+.sizes img{display:block;margin:0 auto 4px;image-rendering:auto}
+.bar{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:6px}
+.bar span{font-size:12px}
+.win{background:#202020;color:#fff}.winl{background:#EEEEF2;color:#111}
+.gnome{background:#000;color:#fff;border-radius:0}.mac{background:rgba(245,245,247,.9);border-radius:16px}
+.tab{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:8px 8px 0 0;font-size:12px}
+</style></head><body>
+<div class="row">
+ <section class="pane dark">
+  <h2>Fundo escuro</h2>
+  <img src="../logo/freekerf-horizontal-dark.svg" height="64" alt="FreeKerf">
+  <img src="../logo/freekerf-horizontal-dark.svg" height="28" alt="FreeKerf">
+  <div class="sizes">
+   <figure><img src="../logo/freekerf-symbol-dark.svg" width="96">símbolo 96</figure>
+   <figure><img src="../icon/png/freekerf-256.png" width="128">ícone 256→128</figure>
+   <figure><img src="../icon/png/freekerf-48.png" width="48">48</figure>
+   <figure><img src="../icon/png/freekerf-32.png" width="32">32</figure>
+   <figure><img src="../icon/png/freekerf-16.png" width="16">16</figure>
+   <figure><img src="../icon/png/freekerf-16.png" width="64" style="image-rendering:pixelated">16 (×4)</figure>
+  </div>
+  <div class="bar win"><img src="../icon/png/freekerf-32.png" width="24"><span>Barra de tarefas escura (Windows)</span><img src="../icon/png/freekerf-16.png" width="16"></div>
+  <div class="bar gnome"><img src="../icon/png/freekerf-48.png" width="32"><span>Dash do GNOME / painel escuro</span></div>
+  <div><span class="tab" style="background:#2B2F36;color:#fff"><img src="../icon/favicon.svg" width="16">FreeKerf — protótipo</span></div>
+ </section>
+ <section class="pane light">
+  <h2>Fundo claro</h2>
+  <img src="../logo/freekerf-horizontal-light.svg" height="64" alt="FreeKerf">
+  <img src="../logo/freekerf-horizontal-light.svg" height="28" alt="FreeKerf">
+  <div class="sizes">
+   <figure><img src="../logo/freekerf-symbol-light.svg" width="96">símbolo 96</figure>
+   <figure><img src="../icon/png/freekerf-macos-256.png" width="128">macOS 256→128</figure>
+   <figure><img src="../icon/png/freekerf-48.png" width="48">48</figure>
+   <figure><img src="../icon/png/freekerf-32.png" width="32">32</figure>
+   <figure><img src="../icon/png/freekerf-16.png" width="16">16</figure>
+   <figure><img src="../icon/freekerf-symbolic.svg" width="16">symbolic</figure>
+  </div>
+  <div class="bar winl"><img src="../icon/png/freekerf-32.png" width="24"><span>Barra de tarefas clara (Windows)</span><img src="../icon/png/freekerf-16.png" width="16"></div>
+  <div class="bar mac"><img src="../icon/png/freekerf-macos-128.png" width="56"><span>Dock do macOS</span></div>
+  <div><span class="tab" style="background:#fff;color:#111;border:1px solid #ddd"><img src="../icon/favicon.svg" width="16">FreeKerf — protótipo</span></div>
+ </section>
+</div>
+<div class="row">
+ <section class="pane" style="background:#fff;color:#000"><h2>Monocromático (preto)</h2><img src="../logo/freekerf-horizontal-mono-black.svg" height="48"><img src="../logo/freekerf-symbol-mono-black.svg" width="48"></section>
+ <section class="pane" style="background:#000;color:#fff"><h2>Monocromático (branco)</h2><img src="../logo/freekerf-horizontal-mono-white.svg" height="48"><img src="../logo/freekerf-symbol-mono-white.svg" width="48"></section>
+ <section class="pane" style="background:#F4A51C;color:#000"><h2>Sobre âmbar (gravação/brinde)</h2><img src="../logo/freekerf-horizontal-mono-black.svg" height="48"></section>
+</div>
+</body></html>

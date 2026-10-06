@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark" data-density="compact" data-mode="design">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<title>FreeKerf</title>
+<link rel="icon" href="../../brand/icon/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../brand/icon/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../../tokens/fk-tokens.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<a class="skip" href="#stage">Pular para o canvas</a>
+
+<!-- ============ BARRA SUPERIOR (sempre visível) ============ -->
+<header class="topbar" role="banner">
+  <div class="brand" aria-label="FreeKerf">
+    <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><rect x="9" y="8" width="13" height="48" rx="2" fill="currentColor"/><path d="M43 8H57L39.5 32 57 56H43L25.5 32Z" fill="var(--fk-color-accent)"/><rect x="23" y="2" width="1.5" height="60" rx=".75" fill="var(--fk-color-accent)" opacity=".75"/></svg>
+    <span class="brand-name">Free<b>Kerf</b></span>
+  </div>
+  <div class="file" title="">
+    <span class="file-name" data-i18n="file.name"></span><span class="file-dirty" aria-hidden="true">•</span>
+  </div>
+
+  <div class="seg mode-switch" role="tablist" aria-label="Modo">
+    <button role="tab" id="modeDesign" data-mode="design" data-icon="pen"><span data-i18n="mode.design"></span></button>
+    <button role="tab" id="modeProduce" data-mode="produce" data-icon="laser"><span data-i18n="mode.produce"></span></button>
+  </div>
+
+  <div class="top-spacer"></div>
+
+  <button class="state-chip" id="stateChip" data-state="offline" aria-live="polite">
+    <span class="state-ico" aria-hidden="true"></span>
+    <span class="state-label"></span>
+  </button>
+  <button class="btn" id="btnConnectTop" data-icon="plug"><span class="lbl" data-i18n="machine.connect"></span></button>
+  <button class="icon-btn" id="btnSettings" data-icon="gear" data-i18n-title="settings.title" aria-haspopup="dialog"></button>
+
+  <button class="estop" id="estop" data-i18n-title="estop.hint">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.3 2.5h7.4l5.8 5.8v7.4l-5.8 5.8H8.3l-5.8-5.8V8.3z"/></svg>
+    <span data-i18n="estop"></span>
+  </button>
+</header>
+
+<!-- ============ ÁREA PRINCIPAL ============ -->
+<div class="main">
+  <!-- trilho de ferramentas -->
+  <nav class="toolrail" aria-label="Ferramentas" id="toolrail">
+    <button class="tool" data-tool="select" data-icon="select" data-i18n-title="tool.select"></button>
+    <button class="tool" data-tool="node" data-icon="node" data-i18n-title="tool.node" data-stub="tool.node"></button>
+    <button class="tool" data-tool="rect" data-icon="rect" data-i18n-title="tool.rect"></button>
+    <button class="tool" data-tool="ellipse" data-icon="ellipse" data-i18n-title="tool.ellipse"></button>
+    <button class="tool" data-tool="text" data-icon="text" data-i18n-title="tool.text"></button>
+    <hr>
+    <button class="tool" data-icon="import" data-i18n-title="tool.import" data-stub="tool.import"></button>
+    <button class="tool" data-icon="trace" data-i18n-title="tool.trace" data-stub="tool.trace"></button>
+    <button class="tool" data-icon="camera" data-i18n-title="tool.camera" data-stub="tool.camera"></button>
+    <hr>
+    <button class="tool" data-icon="weld" data-i18n-title="tool.weld" data-stub="tool.weld"></button>
+    <button class="tool" data-icon="subtract" data-i18n-title="tool.subtract" data-stub="tool.subtract"></button>
+    <button class="tool" data-icon="offset" data-i18n-title="tool.offset" data-stub="tool.offset"></button>
+    <button class="tool" data-act="array" data-icon="array" data-i18n-title="tool.array"></button>
+    <button class="tool" data-icon="test" data-i18n-title="tool.test" data-stub="tool.test"></button>
+    <div class="rail-spacer"></div>
+    <button class="tool" data-act="undo" data-icon="undo" data-i18n-title="tool.undo"></button>
+    <button class="tool" data-act="redo" data-icon="redo" data-i18n-title="tool.redo"></button>
+  </nav>
+
+  <!-- canvas -->
+  <section class="stage" id="stage" aria-label="Canvas" tabindex="-1">
+    <canvas id="cv" tabindex="0" aria-label="Área de trabalho da máquina. Use as setas para mover a seleção."></canvas>
+
+    <div class="banner" id="banner" hidden role="alert">
+      <span class="banner-ico" data-icon="warn"></span>
+      <div class="banner-text"><strong id="bannerTitle"></strong><span id="bannerBody"></span></div>
+      <div class="banner-actions">
+        <button class="btn" id="bannerUnlock" data-icon="unlock"><span data-i18n="machine.unlock"></span></button>
+        <button class="btn primary" id="bannerRecover" data-icon="repeat"><span data-i18n="recover.open"></span></button>
+      </div>
+    </div>
+
+    <div class="readout" id="readout" aria-hidden="true">
+      <div class="readout-pct">0%</div>
+      <div class="readout-sub"></div>
+    </div>
+
+    <div class="canvas-tools" aria-label="Vista">
+      <button class="icon-btn toggle" id="btnMulti" data-icon="multi" data-i18n-title="view.multi" aria-pressed="false"></button>
+      <button class="icon-btn toggle" id="btnMarquee" data-icon="marquee" data-i18n-title="view.marquee" aria-pressed="false"></button>
+      <span class="sep"></span>
+      <button class="icon-btn" data-act="zoomOut" data-icon="zoomOut" data-i18n-title="view.zoomOut"></button>
+      <button class="icon-btn" data-act="fit" data-icon="fit" data-i18n-title="view.fit"></button>
+      <button class="icon-btn" data-act="zoomIn" data-icon="zoomIn" data-i18n-title="view.zoomIn"></button>
+    </div>
+
+    <div class="palette" id="palette" role="toolbar" data-i18n-aria="palette.hint"></div>
+    <div class="narrow-note" data-i18n="mode.narrowNote"></div>
+  </section>
+
+  <!-- trilho de painéis (layout médio: abre drawers) -->
+  <nav class="dockrail" id="dockrail" aria-label="Painéis">
+    <button class="icon-btn" data-panel="layers" data-icon="layers" data-i18n-title="panel.layers"></button>
+    <button class="icon-btn" data-panel="object" data-icon="sliders" data-i18n-title="panel.object"></button>
+    <button class="icon-btn" data-panel="machine" data-icon="machine" data-i18n-title="panel.machine"></button>
+    <button class="icon-btn" data-panel="console" data-icon="console" data-i18n-title="panel.console"></button>
+  </nav>
+
+  <!-- dock / drawer -->
+  <aside class="dock" id="dock" aria-label="Painéis">
+    <div class="dock-tabs" role="tablist">
+      <button role="tab" data-panel="layers" data-icon="layers"><span data-i18n="panel.layers"></span></button>
+      <button role="tab" data-panel="object" data-icon="sliders"><span data-i18n="panel.object"></span></button>
+      <button role="tab" data-panel="machine" data-icon="machine"><span data-i18n="panel.machine"></span></button>
+      <button role="tab" data-panel="console" data-icon="console"><span data-i18n="panel.console"></span></button>
+      <button class="icon-btn dock-close" id="dockClose" data-icon="close" data-i18n-title="panel.close"></button>
+    </div>
+
+    <!-- Camadas -->
+    <section class="panel" data-panel="layers" aria-labelledby="hLayers">
+      <header class="panel-h"><h2 id="hLayers" data-icon="layers"><span data-i18n="panel.layers"></span></h2><span class="panel-sub" data-i18n="layers.order"></span></header>
+      <div class="layer-list" id="layerList" role="list"></div>
+    </section>
+
+    <!-- Objeto -->
+    <section class="panel" data-panel="object" aria-labelledby="hObj">
+      <header class="panel-h"><h2 id="hObj" data-icon="sliders"><span data-i18n="panel.object"></span></h2><span class="panel-sub" id="objSub"></span></header>
+      <div id="inspector" class="inspector"></div>
+    </section>
+
+    <!-- Máquina -->
+    <section class="panel" data-panel="machine" aria-labelledby="hMac">
+      <header class="panel-h"><h2 id="hMac" data-icon="machine"><span data-i18n="panel.machine"></span></h2></header>
+      <div class="machine" id="machine">
+        <div class="group conn">
+          <div class="field-row">
+            <label for="port" data-i18n="machine.port"></label>
+            <select id="port">
+              <option value="sim">Simulador FreeKerf</option>
+              <option value="usb">/dev/ttyUSB0 — CH340 · 115200</option>
+              <option value="wifi">192.168.0.42 — telnet</option>
+            </select>
+          </div>
+          <button class="btn wide" id="btnConnect" data-icon="plug"><span class="lbl" data-i18n="machine.connect"></span></button>
+          <p class="hint" id="connInfo"></p>
+        </div>
+
+        <div class="group job">
+          <div class="job-head">
+            <h3 data-i18n="machine.job"></h3>
+            <span class="job-est"><span data-icon="clock"></span><span id="jobEst">—</span></span>
+          </div>
+          <div class="progress" id="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="bar"></div><span class="pct">0%</span></div>
+          <dl class="job-stats">
+            <div><dt data-i18n="machine.elapsed"></dt><dd id="jobElapsed">0:00</dd></div>
+            <div><dt data-i18n="machine.remaining"></dt><dd id="jobRemain">—</dd></div>
+            <div><dt data-i18n="machine.layerNow"></dt><dd id="jobLayer">—</dd></div>
+          </dl>
+          <p class="hint mono" id="jobLine"></p>
+          <div class="job-actions">
+            <button class="btn primary big" id="btnStart" data-icon="play"><span data-i18n="machine.start"></span></button>
+            <button class="btn big" id="btnPause" data-icon="pause"><span data-i18n="machine.pause"></span></button>
+            <button class="btn big danger-outline" id="btnStop" data-icon="stop"><span data-i18n="machine.stop"></span></button>
+          </div>
+          <button class="btn wide" id="btnFrame" data-icon="frame" data-i18n-title="machine.frameHint"><span data-i18n="machine.frame"></span></button>
+        </div>
+
+        <div class="group">
+          <div class="field-row">
+            <label for="jobOrigin" data-i18n="machine.jobOrigin"></label>
+            <select id="jobOrigin">
+              <option value="abs" data-i18n="machine.jobOrigin.abs"></option>
+              <option value="current" data-i18n="machine.jobOrigin.current"></option>
+              <option value="user" data-i18n="machine.jobOrigin.user"></option>
+            </select>
+          </div>
+          <div class="field-row anchor-row" id="anchorRow">
+            <label data-i18n="machine.anchor"></label>
+            <div class="anchor" id="anchor" role="radiogroup"></div>
+          </div>
+        </div>
+
+        <div class="group jog">
+          <div class="dro" aria-live="off">
+            <div><span>X</span><b id="droX">0.00</b></div>
+            <div><span>Y</span><b id="droY">0.00</b></div>
+          </div>
+          <div class="jog-wrap">
+            <div class="jogpad" id="jogpad">
+              <button data-jog="-1,1" data-icon="upLeft" aria-label="↖"></button>
+              <button data-jog="0,1" data-icon="up" data-i18n-title="jog.n"></button>
+              <button data-jog="1,1" data-icon="upRight" aria-label="↗"></button>
+              <button data-jog="-1,0" data-icon="left" data-i18n-title="jog.w"></button>
+              <button data-jog="home" data-icon="home" data-i18n-title="machine.home"></button>
+              <button data-jog="1,0" data-icon="right" data-i18n-title="jog.e"></button>
+              <button data-jog="-1,-1" data-icon="downLeft" aria-label="↙"></button>
+              <button data-jog="0,-1" data-icon="down" data-i18n-title="jog.s"></button>
+              <button data-jog="1,-1" data-icon="downRight" aria-label="↘"></button>
+            </div>
+            <div class="jog-side">
+              <label class="mini" data-i18n="machine.step"></label>
+              <div class="seg steps" id="steps">
+                <button data-step="0.1">0,1</button><button data-step="1">1</button><button data-step="10" class="on">10</button><button data-step="50">50</button>
+              </div>
+              <label class="check"><input type="checkbox" id="jogCont"><span data-i18n="machine.continuous"></span></label>
+              <div class="mach-btns">
+                <button class="btn" id="btnUnlock" data-icon="unlock"><span data-i18n="machine.unlock"></span></button>
+                <button class="btn" id="btnSetOrigin" data-icon="origin"><span data-i18n="machine.setOrigin"></span></button>
+              </div>
+            </div>
+          </div>
+          <p class="hint" id="jogNote" data-i18n="machine.notConnected"></p>
+        </div>
+
+        <div class="group">
+          <h3 data-i18n="machine.custom"></h3>
+          <div class="custom-btns" id="customBtns">
+            <button class="btn" data-gcode="M3 S10" data-icon="target"><span data-i18n="machine.btn.focus"></span></button>
+            <button class="btn" data-gcode="M8" data-icon="air"><span data-i18n="machine.btn.air"></span></button>
+            <button class="btn" data-gcode="G0 X200 Y150" data-icon="origin"><span data-i18n="machine.btn.center"></span></button>
+            <button class="btn ghost" data-stub="machine.addButton" data-icon="plus"><span data-i18n="machine.addButton"></span></button>
+          </div>
+        </div>
+
+        <details class="group sim">
+          <summary data-i18n="machine.simulate"></summary>
+          <div class="field-row">
+            <label for="simSpeed" data-i18n="machine.simSpeed"></label>
+            <select id="simSpeed"><option value="1">1×</option><option value="5">5×</option><option value="20" selected>20×</option><option value="60">60×</option></select>
+          </div>
+          <div class="mach-btns">
+            <button class="btn" id="simAlarm" data-icon="warn"><span data-i18n="machine.simAlarm"></span></button>
+            <button class="btn" id="simDisc" data-icon="plugOff"><span data-i18n="machine.simDisconnect"></span></button>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- Console -->
+    <section class="panel" data-panel="console" aria-labelledby="hCon">
+      <header class="panel-h"><h2 id="hCon" data-icon="console"><span data-i18n="panel.console"></span></h2>
+        <label class="check small"><input type="checkbox" id="hideStatus" checked><span data-i18n="console.hideStatus"></span></label></header>
+      <div class="console" id="console" role="log" aria-live="polite"></div>
+      <form class="console-in" id="consoleForm">
+        <input id="consoleInput" class="mono" autocomplete="off" spellcheck="false" data-i18n-ph="console.placeholder">
+        <button class="btn" data-icon="right"><span data-i18n="console.send"></span></button>
+      </form>
+    </section>
+  </aside>
+</div>
+
+<!-- ============ BARRA DE STATUS ============ -->
+<footer class="statusbar">
+  <span class="sb-state" id="sbState"></span>
+  <span class="sb-item"><span data-i18n="status.head"></span> <b class="mono" id="sbHead">—</b></span>
+  <span class="sb-item hide-narrow"><span data-i18n="status.sel"></span> <b class="mono" id="sbSel">—</b></span>
+  <span class="sb-item sb-progress" id="sbProgress"></span>
+  <span class="sb-spacer"></span>
+  <button class="sb-btn" id="sbUnits">mm</button>
+  <span class="sb-item hide-narrow"><span data-i18n="status.zoom"></span> <b class="mono" id="sbZoom">100%</b></span>
+  <span class="sb-item hide-narrow sb-input" id="sbInput"></span>
+</footer>
+
+<!-- ============ BARRA INFERIOR (celular / retrato) ============ -->
+<div class="bottombar" id="bottombar">
+  <button class="btn primary big" data-proxy="btnStart" data-icon="play"><span data-i18n="machine.start"></span></button>
+  <button class="btn big" data-proxy="btnPause" data-icon="pause"><span data-i18n="machine.pause"></span></button>
+  <button class="btn big" data-proxy="btnFrame" data-icon="frame"><span data-i18n="machine.frame"></span></button>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+
+<!-- ============ DIÁLOGOS ============ -->
+<dialog class="dlg settings" id="dlgSettings" aria-labelledby="hSettings">
+  <header><h2 id="hSettings" data-i18n="settings.title"></h2><button class="icon-btn" data-close data-icon="close" data-i18n-title="common.close"></button></header>
+  <div class="dlg-body form-grid">
+    <label data-i18n="settings.theme"></label>
+    <div class="seg" id="setTheme"><button data-v="dark" data-icon="moon"><span data-i18n="theme.dark"></span></button><button data-v="light" data-icon="sun"><span data-i18n="theme.light"></span></button></div>
+    <label data-i18n="settings.contrast"></label>
+    <label class="switch"><input type="checkbox" id="setContrast"><span></span></label>
+    <label data-i18n="settings.density"></label>
+    <div class="seg wrap" id="setDensity"><button data-v="auto"><span data-i18n="density.auto"></span></button><button data-v="compact" data-icon="mouse"><span data-i18n="density.compact"></span></button><button data-v="comfortable" data-icon="touch"><span data-i18n="density.comfortable"></span></button></div>
+    <label data-i18n="settings.lang"></label>
+    <div class="seg" id="setLang"><button data-v="pt-BR">Português (BR)</button><button data-v="de">Deutsch</button></div>
+    <label data-i18n="settings.units"></label>
+    <div class="seg" id="setUnits"><button data-v="mm">mm</button><button data-v="in" data-i18n="units.in"></button></div>
+  </div>
+  <footer>
+    <button class="btn" id="btnShortcuts" data-icon="info"><span data-i18n="settings.shortcuts"></span></button>
+    <button class="btn" id="btnWelcomeAgain" data-icon="sparkle"><span data-i18n="settings.welcome"></span></button>
+  </footer>
+</dialog>
+
+<dialog class="dlg" id="dlgShortcuts" aria-labelledby="hShort">
+  <header><h2 id="hShort" data-i18n="shortcuts.title"></h2><button class="icon-btn" data-close data-icon="close" data-i18n-title="common.close"></button></header>
+  <div class="dlg-body"><table class="kbd-table" id="kbdTable"></table></div>
+</dialog>
+
+<dialog class="dlg preflight" id="dlgPreflight" aria-labelledby="hPre">
+  <header><h2 id="hPre" data-icon="laser"><span data-i18n="preflight.title"></span></h2></header>
+  <div class="dlg-body">
+    <p class="pre-sum mono" id="preSum"></p>
+    <ul class="checklist">
+      <li><label class="check"><input type="checkbox"><span data-i18n="preflight.c1"></span></label></li>
+      <li><label class="check"><input type="checkbox"><span data-i18n="preflight.c2"></span></label></li>
+      <li><label class="check"><input type="checkbox"><span data-i18n="preflight.c3"></span></label></li>
+      <li><label class="check"><input type="checkbox"><span data-i18n="preflight.c4"></span></label></li>
+    </ul>
+    <p class="hint" data-i18n="preflight.note"></p>
+  </div>
+  <footer>
+    <button class="btn" data-close data-i18n="preflight.cancel"></button>
+    <button class="btn primary big" id="btnFire" data-icon="laser"><span id="fireLbl"></span></button>
+  </footer>
+</dialog>
+
+<dialog class="dlg" id="dlgRecover" aria-labelledby="hRec">
+  <header><h2 id="hRec" data-icon="repeat"><span data-i18n="recover.title"></span></h2><button class="icon-btn" data-close data-icon="close" data-i18n-title="common.close"></button></header>
+  <div class="dlg-body">
+    <p class="hint"><b data-i18n="recover.cause"></b>: <span id="recCause"></span></p>
+    <div class="radios" id="recOpts"></div>
+    <label class="check"><input type="checkbox" id="recHoming"><span data-i18n="recover.homing"></span></label>
+    <label class="check"><input type="checkbox" id="recWco" checked><span id="recWcoLbl"></span></label>
+  </div>
+  <footer>
+    <button class="btn" data-close data-i18n="recover.dismiss"></button>
+    <button class="btn primary" id="btnRecoverGo" data-icon="play"><span data-i18n="recover.go"></span></button>
+  </footer>
+</dialog>
+
+<dialog class="dlg welcome" id="dlgWelcome" aria-labelledby="hWel">
+  <div class="wel-steps" id="welSteps"></div>
+</dialog>
+
+<div class="ctxmenu" id="ctxmenu" role="menu" hidden></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="i18n.js"></script>
+<script src="icons.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

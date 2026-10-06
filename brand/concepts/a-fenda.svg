@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="FreeKerf — conceito A: Fenda">
+  <defs>
+    <mask id="cut-a"><rect width="64" height="64" fill="#fff"/><path d="M62 2 L31 33" stroke="#000" stroke-width="5" stroke-linecap="round"/></mask>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="13" fill="#F4A51C" mask="url(#cut-a)"/>
+  <circle cx="31" cy="33" r="4" fill="#FFF4D6"/>
+</svg>
